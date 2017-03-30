@@ -1,22 +1,61 @@
-<!DOCTYPE html>
+
+
+<!doctype html>
 
 <html>
+  <head>
+    <title>Auto-adjust</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <style>
+      body {
+        text-align: center;
+      }
 
-<head>
-    <meta charset="utf-8">
-    <title>APP</title>
+      #g1 {
+        width:400px; height:320px;
+        display: inline-block;
+        margin: 1em;
+      }
+
+
+      p {
+        display: block;
+        width: 450px;
+        margin: 2em auto;
+        text-align: left;
+      }
+    </style>
     <script src="/socket.io/socket.io.js"></script>
-</head>
 
-<body>
+  </head>
+  <body>
+    <div id="g1"></div>
 
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/raphael-2.1.4.min.js"></script>
+    <script src="js/justgage.js"></script>
     <script>
-      var socket = io.connect();
-      socket.on('angle', function(data) {
-          //emit callback from server
-          console.log(data)
-      });
-    </script>
-</body>
+      var g1, g2, g3, g4;
 
+        var g1 = new JustGage({
+          id: "g1",
+          value: getRandomInt(0, 100),
+          min: 0,
+          max: 4096,
+          title: "SSC DDS Demo",
+          label: "10 bit Data"
+        });
+
+
+        var socket = io.connect();
+        socket.on('angle', function(data) {
+            //emit callback from server
+            console.log(data.msg);
+            g1.refresh(data.msg);
+
+        });
+
+    </script>
+  </body>
 </html>

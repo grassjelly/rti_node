@@ -6,18 +6,54 @@
 
 var sleep = require('sleep');
 var rti   = require('rticonnextdds-connector');
-console.log("HELLOs");
 var connector = new rti.Connector("MyParticipantLibrary::Zero",__dirname + "/HelloWorld.xml");
 var input = connector.getInput("MySubscriber::HelloWorldReader");
+var express = require('express');
 
-for (;;) {
-    console.log("Waiting for samples...");
-    input.take();
-    for (i=1; i <= input.samples.getLength(); i++) {
-      if (input.infos.isValid(i)) {
-        console.log(JSON.stringify(input.samples.getJSON(i)));
-      }
-    }
+var app = express();
+var server = require('http').createServer(app);
+var io = require('socket.io')(server);
+//either use cloud service port or local port:3000
+var port = process.env.PORT || 8000;
 
-    sleep.sleep(2);
-}
+
+server.listen(port, function () {
+  console.log('Server listening at port %d', port);
+});
+
+app.use(express.static(__dirname));
+
+
+connector.on('on_data_available',
+   function() {
+     input.take();
+     for (i=1; i <= input.samples.getLength(); i++) {
+         if (input.infos.isValid(i)) {
+            var jsonObj = input.samples.getJSON(i);
+             console.log(JSON.stringify(jsonObj));
+             io.sockets.emit('angle', jsonObj);
+         }
+     }
+
+});
+
+
+// var express = require('express');
+// var app = express();
+// var server = require('http').createServer(app);
+// var io = require('socket.io')(server);
+// //either use cloud service port or local port:3000
+// var port = process.env.PORT || 8000;
+
+// server.listen(port, function () {
+//   console.log('Server listening at port %d', port);
+// });
+
+// app.use(express.static(__dirname));
+
+// io.sockets.on('connection', function(socket) {
+//     socket.emit("hello", "Hello from Server");
+//     socket.on("hello", function(data) {
+//       console.log(data);
+//     });
+// });

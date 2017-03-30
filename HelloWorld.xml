@@ -47,7 +47,7 @@
     <!-- types -->
     <types>
 	   	<struct name="HelloWorld" extensibility="extensible">
-			<member name="msg" stringMaxLength="128" id="0" type="string"/>
+			<member name="msg" id="0" type="long"/>
 		</struct>
     </types>
 
